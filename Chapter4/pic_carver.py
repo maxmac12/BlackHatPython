@@ -84,6 +84,7 @@ def extract_image(headers, http_payload):
 def http_assembler(pcap_file):
     carved_images  = 0
     faces_detected = 0
+    img_data = []
 
     # Read in the PCAP file for processing
     a = scapy.rdpcap(pcap_file)
@@ -101,34 +102,14 @@ def http_assembler(pcap_file):
                 pkt = packet.getlayer(http.HTTP)
 
                 # Skip HTTP request packets
-                if pkt.haslayer(http.HTTPRequest):
-                    continue
-
-                if pkt.haslayer(http.HTTPResponse):
-                    # Check if the response contains image data.
-                    header = dict(re.findall(b"(?P<name>.*?): (?P<value>.*?)\r\n", bytes(pkt)))
-
+                if pkt.haslayer(http.HTTPRequest) or pkt.haslayer(http.HTTPResponse):
                     # Store any previous image data.
                     if img_type and img_payload:
-                        # Store the image
-                        file_name = "{}-pic_carver_{}.{}".format(pcap_file, carved_images, img_type.decode())
+                        img_data.append((img_type, img_payload))
 
-                        with open("{}/{}".format(pictures_dir, file_name), "wb") as fd:
-                            fd.write(img_payload)
-                            print("Saved: {}".format(file_name))
-
-                            # Attempt face detection
-                            try:
-                                result = face_detect("{}/{}".format(pictures_dir, file_name), file_name)
-
-                                if result is True:
-                                    faces_detected += 1
-                            except Exception as inst:
-                                print(inst)
-                                pass
-
-                        carved_images += 1
-                        img_type = b""
+                    # Check if the response contains image data.
+                    header = dict(re.findall(b"(?P<name>.*?): (?P<value>.*?)\r\n", bytes(pkt)))
+                    img_type = b""
 
                     if b"Content-Type" in header:
                         if b"image" in header[b"Content-Type"]:
@@ -139,7 +120,28 @@ def http_assembler(pcap_file):
                             img_payload = bytes(pkt[scapy.Raw])
                 elif img_type:
                     img_payload += bytes(pkt)
+        if img_type and img_payload:
+            img_data.append((img_type, img_payload))
 
+    for type, data in img_data:
+        # Store the image
+        file_name = "{}-pic_carver_{}.{}".format(pcap_file, carved_images, type.decode())
+
+        with open("{}/{}".format(pictures_dir, file_name), "wb") as fd:
+            fd.write(data)
+            print("Saved: {}".format(file_name))
+
+            # Attempt face detection
+            try:
+                result = face_detect("{}/{}".format(pictures_dir, file_name), file_name)
+
+                if result is True:
+                    faces_detected += 1
+            except Exception as inst:
+                print(inst)
+                pass
+
+        carved_images += 1
 
     return carved_images, faces_detected
 
