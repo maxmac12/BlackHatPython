@@ -61,5 +61,8 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
+# User ignores
 BHP-Code/
 venv/
+.idea/
+desktop.ini
