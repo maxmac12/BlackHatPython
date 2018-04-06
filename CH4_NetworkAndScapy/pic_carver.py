@@ -99,13 +99,13 @@ def http_assembler(pcap_file):
                 elif img_encoding == b"deflate":
                     img_payload = zlib.decompress(img_payload)
                 else:
-                    print("Unsupported image compression: {}".format(img_encoding.decode()))
+                    print("Unsupported image compression: {}".format(img_encoding.decode('utf-8')))
             except Exception as inst:
                 print(inst)
                 pass
 
         # Store the image
-        file_name = "{}-pic_carver_{}.{}".format(pcap_file, num_images, img_type.decode())
+        file_name = "{}-pic_carver_{}.{}".format(pcap_file, num_images, img_type.decode('utf-8'))
 
         with open("{}/{}".format(pictures_dir, file_name), "wb") as fd:
             fd.write(img_payload)
