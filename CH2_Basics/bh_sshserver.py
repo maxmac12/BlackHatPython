@@ -58,8 +58,8 @@ def main():
 
         chan = bhSession.accept(20)
         print("[+] User Authenticated.")
-        print(chan.recv(1024).decode())
-        chan.send("Welcome to bh_ssh".encode())
+        print(chan.recv(1024).decode('utf-8'))
+        chan.send("Welcome to bh_ssh".encode('utf-8'))
 
         while True:
             try:
@@ -69,10 +69,10 @@ def main():
                 # Verify that a command was entered, otherwise sending will block.
                 if len(command):
                     if command != "exit":
-                        chan.send(command.encode())
-                        print(chan.recv(1024).decode() + "\n")
+                        chan.send(command.encode('utf-8'))
+                        print(chan.recv(1024).decode('utf-8') + "\n")
                     else:
-                        chan.send("exit".encode())
+                        chan.send("exit".encode('utf-8'))
                         print("Exiting.")
                         bhSession.close()
                         raise Exception("Exit")

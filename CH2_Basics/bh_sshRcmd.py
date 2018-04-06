@@ -26,7 +26,7 @@ def ssh_command(ip, user, passwd, command):
 
     if ssh_session.active:
         ssh_session.send(command)
-        print(ssh_session.recv(1024).decode())  # Read banner
+        print(ssh_session.recv(1024).decode('utf-8'))  # Read banner
 
         while True:
             command = ssh_session.recv(1024)  # Get the command from the SSH server

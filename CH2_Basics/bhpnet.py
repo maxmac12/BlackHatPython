@@ -55,13 +55,13 @@ def client_handler(client_socket):
     if len(EXECUTE):
         # run the command
         output = run_command(EXECUTE)
-        client_socket.send(output.decode())
+        client_socket.send(output.decode('utf-8'))
 
     # now go into another loop if a command shell was requested
     if COMMAND_SHELL:
         while True:
             # show a simple prompt
-            client_socket.send("<BHP:#> ".encode())
+            client_socket.send("<BHP:#> ".encode('utf-8'))
 
             # now we receive until we see a linefeed (ENTER key)
             cmd_buffer = ""
@@ -144,7 +144,7 @@ def client_sender():
             buffer += "\n"
 
             # send data to the server
-            client.send(buffer.encode())
+            client.send(buffer.encode('utf-8'))
     except socket.error as err:
         print("{0} Client Exception! Exiting.".format(str(err)))
     except OSError as err:
