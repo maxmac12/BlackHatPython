@@ -119,19 +119,18 @@ def KeyDownEvent(event):
 
 
 if __name__ == "__main__":
-    # Currently only supports Windows.
-    if os.name == 'nt':
-        key_layout = create_unicode_buffer(MAX_PATH)
-        if USER32.GetKeyboardLayoutNameW(byref(key_layout)):
-            print("KeyBoard Layout: {}".format(key_layout.value))
-        else:
-            print("Unknown KeyBoard Layout")
 
-        # Create a hook manager and bind events
-        hook_manager = HookManager()
-        hook_manager.KeyDown = KeyDownEvent
+    key_layout = create_unicode_buffer(MAX_PATH)
 
-        # Register the hook and execute forever
-        hook_manager.HookKeyboard()
+    if USER32.GetKeyboardLayoutNameW(byref(key_layout)):
+        print("KeyBoard Layout: {}".format(key_layout.value))
+    else:
+        print("Unknown KeyBoard Layout")
 
-        pythoncom.PumpMessages()
+    # Create a hook manager and bind events
+    hook_manager = HookManager()
+    hook_manager.KeyDown = KeyDownEvent
+
+    # Register the hook and execute forever
+    hook_manager.HookKeyboard()
+    pythoncom.PumpMessages()
